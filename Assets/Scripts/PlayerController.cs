@@ -12,6 +12,10 @@ public class PlayerController : MonoBehaviour
     public bool isHider = true;
     public GameObject hideEffect;
     
+    [Header("Mobile Controls")]
+    public FixedJoystick joystick; // Assign in Inspector
+    public Button hideButton;      // Assign in Inspector
+    
     private CharacterController characterController;
     private Vector3 moveDirection;
     private bool isHidden = false;
@@ -20,59 +24,105 @@ public class PlayerController : MonoBehaviour
     {
         characterController = GetComponent<CharacterController>();
         
+        // Auto-find mobile controls if not assigned
+        if (joystick == null)
+            joystick = FindObjectOfType<FixedJoystick>();
+            
+        if (hideButton == null)
+        {
+            // Find button in children
+            hideButton = GetComponentInChildren<Button>();
+        }
+        
+        // Setup hide button listener
+        if (hideButton != null)
+        {
+            hideButton.onClick.AddListener(ToggleHide);
+        }
+        
         // Set player appearance based on role
         if (isHider)
         {
-            // Hiders are green
             GetComponent<Renderer>().material.color = Color.green;
         }
         else
         {
-            // Seekers are red
             GetComponent<Renderer>().material.color = Color.red;
         }
     }
     
     void Update()
     {
-        // Movement
-        float horizontal = Input.GetAxis("Horizontal");
-        float vertical = Input.GetAxis("Vertical");
-        
-        moveDirection = new Vector3(horizontal, 0, vertical).normalized;
-        
-        if (moveDirection.magnitude > 0.1f)
+        // Mobile Movement (Joystick)
+        if (joystick != null)
         {
-            // Rotate towards movement
-            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            float horizontal = joystick.Horizontal;
+            float vertical = joystick.Vertical;
             
-            // Move
-            characterController.Move(moveDirection * moveSpeed * Time.deltaTime);
+            moveDirection = new Vector3(horizontal, 0, vertical).normalized;
+            
+            if (moveDirection.magnitude > 0.1f)
+            {
+                // Rotate towards movement
+                Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+                
+                // Move
+                characterController.Move(moveDirection * moveSpeed * Time.deltaTime);
+            }
         }
         
-        // Hide ability (for hiders)
-        if (isHider && Input.GetKeyDown(KeyCode.Space))
+        // PC Movement (Keyboard)
+        else
         {
-            ToggleHide();
+            float horizontal = Input.GetAxis("Horizontal");
+            float vertical = Input.GetAxis("Vertical");
+            
+            moveDirection = new Vector3(horizontal, 0, vertical).normalized;
+            
+            if (moveDirection.magnitude > 0.1f)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+                characterController.Move(moveDirection * moveSpeed * Time.deltaTime);
+            }
+            
+            // PC Hide (Space)
+            if (isHider && Input.GetKeyDown(KeyCode.Space))
+            {
+                ToggleHide();
+            }
         }
     }
     
-    void ToggleHide()
+    // Public method for mobile button
+    public void ToggleHide()
     {
+        if (!isHider) return; // Only hiders can hide
+        
         isHidden = !isHidden;
         
         if (isHidden)
         {
             // Become invisible
             GetComponent<Renderer>().enabled = false;
-            hideEffect.SetActive(true);
+            if (hideEffect != null)
+                hideEffect.SetActive(true);
+            
+            // Change button text
+            if (hideButton != null)
+                hideButton.GetComponentInChildren<Text>().text = "Show";
         }
         else
         {
             // Become visible
             GetComponent<Renderer>().enabled = true;
-            hideEffect.SetActive(false);
+            if (hideEffect != null)
+                hideEffect.SetActive(false);
+            
+            // Change button text
+            if (hideButton != null)
+                hideButton.GetComponentInChildren<Text>().text = "Hide";
         }
     }
     
@@ -85,11 +135,11 @@ public class PlayerController : MonoBehaviour
             isHider = false;
             GetComponent<Renderer>().material.color = Color.red;
             
-            // Notify game manager
-            HideAndSeekGame game = FindObjectOfType<HideAndSeekGame>();
-            if (game != null)
+            // Show if hidden
+            if (isHidden)
             {
-                // Update UI
+                GetComponent<Renderer>().enabled = true;
+                isHidden = false;
             }
         }
     }
