@@ -235,11 +235,6 @@ public class GameAutoSetup : MonoBehaviour
         mobileUIObj.transform.SetParent(canvasObj.transform);
         MobileUI mobileUI = mobileUIObj.AddComponent<MobileUI>();
         
-        // Create GameUI
-        GameObject gameUIObj = new GameObject("GameUI");
-        gameUIObj.transform.SetParent(canvasObj.transform);
-        GameUI gameUI = gameUIObj.AddComponent<GameUI>();
-        
         // Create Joystick
         GameObject joystickObj = new GameObject("Joystick");
         joystickObj.transform.SetParent(canvasObj.transform);
@@ -279,6 +274,9 @@ public class GameAutoSetup : MonoBehaviour
             playerController.joystick = joystick;
         }
         
+        // Link MobileUI
+        mobileUI.joystick = joystick;
+        
         Debug.Log("✅ UI created!");
     }
     
@@ -307,7 +305,7 @@ public class GameAutoSetup : MonoBehaviour
         
         Text textComponent = textObj.AddComponent<Text>();
         textComponent.text = text;
-        textComponent.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        textComponent.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
         textComponent.fontSize = 18;
         textComponent.alignment = TextAnchor.MiddleCenter;
         textComponent.color = Color.black;
