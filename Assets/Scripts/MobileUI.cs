@@ -4,7 +4,7 @@ using UnityEngine.UI;
 public class MobileUI : MonoBehaviour
 {
     [Header("Mobile Controls")]
-    public FixedJoystick joystick;
+    public SimpleJoystick joystick;  // Changed from FixedJoystick
     public Button hideButton;
     public Button catchButton;
     public Button jumpButton;
