@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using Nakama;
 using System.Threading.Tasks;
 
@@ -13,7 +14,7 @@ public class PlayerController : MonoBehaviour
     public GameObject hideEffect;
     
     [Header("Mobile Controls")]
-    public FixedJoystick joystick; // Assign in Inspector
+    public SimpleJoystick joystick; // Assign in Inspector
     public Button hideButton;      // Assign in Inspector
     
     private CharacterController characterController;
@@ -26,7 +27,7 @@ public class PlayerController : MonoBehaviour
         
         // Auto-find mobile controls if not assigned
         if (joystick == null)
-            joystick = FindObjectOfType<FixedJoystick>();
+            joystick = FindObjectOfType<SimpleJoystick>();
             
         if (hideButton == null)
         {
