@@ -10,6 +10,7 @@ public class NakamaManager : MonoBehaviour
     
     public static Client Client { get; private set; }
     public static ISession Session { get; private set; }
+    public static ISocket Socket { get; private set; }
     public static bool IsConnected { get; private set; }
     
     public static System.Action OnConnected;
@@ -30,6 +31,10 @@ public class NakamaManager : MonoBehaviour
             
             var deviceId = SystemInfo.deviceUniqueIdentifier;
             Session = await Client.AuthenticateDeviceAsync(deviceId);
+            
+            // Connect socket for realtime
+            Socket = Client.NewSocket();
+            await Socket.ConnectAsync(Session);
             
             IsConnected = true;
             
