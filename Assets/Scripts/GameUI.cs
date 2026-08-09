@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
+using Nakama;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 public class GameUI : MonoBehaviour
 {
@@ -116,7 +118,7 @@ public class GameUI : MonoBehaviour
                 })
             };
             
-            await NakamaManager.Client.WriteStorageObjectsAsync(NakamaManager.Session, storageObject);
+            await NakamaManager.Client.WriteStorageObjectsAsync(NakamaManager.Session, new[] { storageObject });
             
             AddChatMessage(NakamaManager.Session.Username, message);
             
@@ -146,18 +148,15 @@ public class GameUI : MonoBehaviour
         scrollRect.verticalNormalizedPosition = 0;
     }
     
-    async void UpdatePlayersCount()
+    void UpdatePlayersCount()
     {
-        try
+        // Simple display - ListUsersAsync not available in this Nakama version
+        playersText.text = "Online Players: --";
+        
+        // Alternative: Use socket presence if needed
+        if (NakamaManager.Socket != null && NakamaManager.Socket.IsConnected)
         {
-            // Get online users
-            var result = await NakamaManager.Client.ListUsersAsync(NakamaManager.Session);
-            playersText.text = $"Online Players: {result.Users.Count()}";
-        }
-        catch (System.Exception e)
-        {
-            playersText.text = "Online Players: --";
-            Debug.LogError("Failed to get players: " + e.Message);
+            playersText.text = "Status: Connected";
         }
     }
 }
