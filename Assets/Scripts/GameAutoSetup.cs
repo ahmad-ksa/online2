@@ -222,6 +222,14 @@ public class GameAutoSetup : MonoBehaviour
         
         canvasObj.AddComponent<GraphicRaycaster>();
         
+        // Create EventSystem if not exists
+        if (FindObjectOfType<UnityEngine.EventSystems.EventSystem>() == null)
+        {
+            GameObject eventSystemObj = new GameObject("EventSystem");
+            eventSystemObj.AddComponent<UnityEngine.EventSystems.EventSystem>();
+            eventSystemObj.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
+        }
+        
         // Create MobileUI
         GameObject mobileUIObj = new GameObject("MobileUI");
         mobileUIObj.transform.SetParent(canvasObj.transform);
@@ -237,7 +245,7 @@ public class GameAutoSetup : MonoBehaviour
         joystickObj.transform.SetParent(canvasObj.transform);
         
         RectTransform joystickRect = joystickObj.AddComponent<RectTransform>();
-        joystickRect.anchoredPosition = new Vector2(100, 100);
+        joystickRect.anchoredPosition = new Vector2(200, 200);
         joystickRect.sizeDelta = new Vector2(150, 150);
         
         Image joystickImage = joystickObj.AddComponent<Image>();
@@ -256,13 +264,13 @@ public class GameAutoSetup : MonoBehaviour
         Image handleImage = handleObj.AddComponent<Image>();
         handleImage.color = Color.red;
         
-        joystick.joystickHandle = handleRect;
-        joystick.joystickBackground = joystickRect;
+        joystick.handle = handleRect;
+        joystick.background = joystickRect;
         
         // Create Buttons
-        CreateButton(canvasObj, "HideButton", new Vector2(-100, 100), "Hide", buttonColor);
-        CreateButton(canvasObj, "CatchButton", new Vector2(-100, 200), "Catch", buttonColor);
-        CreateButton(canvasObj, "JumpButton", new Vector2(-100, 300), "Jump", buttonColor);
+        CreateButton(canvasObj, "HideButton", new Vector2(-200, 200), "Hide", buttonColor);
+        CreateButton(canvasObj, "CatchButton", new Vector2(-200, 300), "Catch", buttonColor);
+        CreateButton(canvasObj, "JumpButton", new Vector2(-200, 400), "Jump", buttonColor);
         
         // Link UI to Player
         PlayerController playerController = FindObjectOfType<PlayerController>();
@@ -270,9 +278,6 @@ public class GameAutoSetup : MonoBehaviour
         {
             playerController.joystick = joystick;
         }
-        
-        // Link MobileUI
-        mobileUI.joystick = joystick;
         
         Debug.Log("✅ UI created!");
     }
