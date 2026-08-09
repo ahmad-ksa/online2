@@ -7,6 +7,9 @@ public class SchoolMapGenerator : MonoBehaviour
     public int mapHeight = 20;
     public float cellSize = 2f;
     
+    [Header("Auto Generate")]
+    public bool generateOnStart = false;
+    
     [Header("Prefabs")]
     public GameObject floorPrefab;
     public GameObject wallPrefab;
@@ -19,11 +22,18 @@ public class SchoolMapGenerator : MonoBehaviour
     
     void Start()
     {
-        GenerateSchoolMap();
+        if (generateOnStart)
+        {
+            GenerateSchoolMap();
+        }
     }
     
-    void GenerateSchoolMap()
+    [ContextMenu("Generate Map")]
+    public void GenerateSchoolMap()
     {
+        // Clear existing map
+        ClearMap();
+        
         // Create floor
         CreateFloor();
         
@@ -38,10 +48,37 @@ public class SchoolMapGenerator : MonoBehaviour
         
         // Create lockers
         CreateLockers();
+        
+        Debug.Log("✅ School map generated successfully!");
+    }
+    
+    [ContextMenu("Clear Map")]
+    public void ClearMap()
+    {
+        // Destroy all children
+        for (int i = transform.childCount - 1; i >= 0; i--)
+        {
+            if (Application.isPlaying)
+            {
+                Destroy(transform.GetChild(i).gameObject);
+            }
+            else
+            {
+                DestroyImmediate(transform.GetChild(i).gameObject);
+            }
+        }
+        
+        Debug.Log("🗑️ Map cleared!");
     }
     
     void CreateFloor()
     {
+        if (floorPrefab == null)
+        {
+            Debug.LogWarning("Floor Prefab is not assigned!");
+            return;
+        }
+        
         GameObject floor = Instantiate(floorPrefab, transform);
         floor.transform.position = new Vector3(mapWidth * cellSize / 2, 0, mapHeight * cellSize / 2);
         floor.transform.localScale = new Vector3(mapWidth * cellSize / 10, 1, mapHeight * cellSize / 10);
@@ -49,6 +86,12 @@ public class SchoolMapGenerator : MonoBehaviour
     
     void CreateWalls()
     {
+        if (wallPrefab == null)
+        {
+            Debug.LogWarning("Wall Prefab is not assigned!");
+            return;
+        }
+        
         // Outer walls
         CreateWall(new Vector3(0, 1.5f, 0), new Vector3(mapWidth * cellSize, 3, 0.2f)); // Bottom
         CreateWall(new Vector3(0, 1.5f, mapHeight * cellSize), new Vector3(mapWidth * cellSize, 3, 0.2f)); // Top
@@ -64,12 +107,24 @@ public class SchoolMapGenerator : MonoBehaviour
     
     void CreateWall(Vector3 position, Vector3 scale)
     {
+        if (wallPrefab == null)
+        {
+            Debug.LogWarning("Wall Prefab is not assigned!");
+            return;
+        }
+        
         GameObject wall = Instantiate(wallPrefab, position, Quaternion.identity, transform);
         wall.transform.localScale = scale;
     }
     
     void CreateClassrooms()
     {
+        if (classroomPrefab == null)
+        {
+            Debug.LogWarning("Classroom Prefab is not assigned!");
+            return;
+        }
+        
         // Classroom 1 (Top Left)
         CreateClassroom(new Vector3(mapWidth * cellSize * 0.15f, 0, mapHeight * cellSize * 0.2f), "Math Class");
         
@@ -85,6 +140,12 @@ public class SchoolMapGenerator : MonoBehaviour
     
     void CreateClassroom(Vector3 position, string name)
     {
+        if (classroomPrefab == null)
+        {
+            Debug.LogWarning("Classroom Prefab is not assigned!");
+            return;
+        }
+        
         GameObject classroom = Instantiate(classroomPrefab, position, Quaternion.identity, transform);
         classroom.name = name;
         
@@ -112,6 +173,12 @@ public class SchoolMapGenerator : MonoBehaviour
     
     void CreateHallways()
     {
+        if (hallwayPrefab == null)
+        {
+            Debug.LogWarning("Hallway Prefab is not assigned!");
+            return;
+        }
+        
         // Hallway floor
         GameObject hallway = Instantiate(hallwayPrefab, transform);
         hallway.transform.position = new Vector3(mapWidth * cellSize / 2, 0.01f, mapHeight * cellSize / 2);
@@ -120,6 +187,12 @@ public class SchoolMapGenerator : MonoBehaviour
     
     void CreateLockers()
     {
+        if (lockerPrefab == null)
+        {
+            Debug.LogWarning("Locker Prefab is not assigned!");
+            return;
+        }
+        
         // Lockers along hallway
         for (int i = 0; i < 5; i++)
         {
@@ -130,6 +203,12 @@ public class SchoolMapGenerator : MonoBehaviour
     
     void CreateLocker(Vector3 position)
     {
+        if (lockerPrefab == null)
+        {
+            Debug.LogWarning("Locker Prefab is not assigned!");
+            return;
+        }
+        
         GameObject locker = Instantiate(lockerPrefab, position, Quaternion.identity, transform);
         locker.transform.localScale = new Vector3(0.5f, 1.5f, 0.3f);
     }
